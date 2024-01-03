@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <!-- Include the Tailwind CSS CDN or link to your local stylesheet -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+
+    <!-- Navbar -->
+    <nav class="bg-blue-500 p-4">
+        <div class="container mx-auto">
+            <a href="#" class="text-white font-bold text-xl">Login Page</a>
+        </div>
+    </nav>
+
+    <!-- Login Form -->
+    <div class="flex items-center justify-center h-screen">
+        <div class="bg-white p-8 rounded shadow-md w-full md:w-1/2 lg:w-1/3 xl:w-1/4">
+            <h2 class="text-2xl font-bold mb-6">Login</h2>
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label for="username" class="block text-gray-600 text-sm font-semibold mb-2">Username</label>
+                    <input type="text" id="username" name="username" class="w-full p-2 border border-gray-300 rounded">
+                </div>
+                <div class="mb-6">
+                    <label for="password" class="block text-gray-600 text-sm font-semibold mb-2">Password</label>
+                    <input type="password" id="password" name="password" class="w-full p-2 border border-gray-300 rounded">
+                </div>
+                <button type="submit" class="bg-blue-500 text-white p-2 rounded w-full">Login</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

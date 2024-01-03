@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Library Management</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    body {
+      padding-top: 50px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2 class="text-center">Library Management</h2>
+
+  <!-- Add Button -->
+  <button class="btn btn-primary" data-toggle="modal" data-target="#addBookModal">Add Book</button>
+
+  <!-- Search Input -->
+  <div class="form-group float-right">
+    <input type="text" class="form-control" id="searchInput" placeholder="Search">
+  </div>
+
+  <!-- Search Button -->
+  <button class="btn btn-secondary float-right mr-2" onclick="searchTable()">Search</button>
+
+  <!-- Book Table -->
+  <table class="table mt-4">
+    <thead>
+      <tr>
+        <th>Book Name</th>
+        <th>Author</th>
+        <th>Publish Year</th>
+        <th>User Issued</th>
+        <th>Date Issued</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% for i in BookData %}
+      <tr>
+        <td>{{i.name}}</td>
+        <td>{{i.author}}</td>
+        <td>{{i.publish_year}}</td>
+        {% for j in issueData %}
+        {% if j.book.id == i.id %}
+        <td>{{j.username.student_name}}</td>
+        <td>{{j.date_issued}}</td>
+        {% endif %}
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Add Book Modal -->
+<div class="modal fade" id="addBookModal" tabindex="-1" role="dialog" aria-labelledby="addBookModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addBookModalLabel">Add Book</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Add Book Form -->
+        <div>
+          <div class="form-group">
+            <label for="bookName">Book Name</label>
+            <input type="text" class="form-control" id="bookName" required>
+          </div>
+          <div class="form-group">
+            <label for="author">Author</label>
+            <input type="text" class="form-control" id="author" required>
+          </div>
+          <div class="form-group">
+            <label for="publishYear">Publish Year</label>
+            <input type="number" class="form-control" id="publishYear" required>
+          </div>
+          <button id="newbook" class="btn btn-primary">Add</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+<script>
+  function searchTable() {
+    var input, filter, table, tr, td, i, txtValue;
+    input = document.getElementById("searchInput");
+    filter = input.value.toUpperCase();
+    table = document.querySelector("table");
+    tr = table.getElementsByTagName("tr");
+
+    for (i = 0; i < tr.length; i++) {
+      td = tr[i].getElementsByTagName("td")[0];
+      if (td) {
+        txtValue = td.textContent || td.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          tr[i].style.display = "";
+        } else {
+          tr[i].style.display = "none";
+        }
+      }
+    }
+  }
+  
+  document.getElementById("newbook").addEventListener("click",function() {
+    data=new FormData();        
+    data.append("csrfmiddlewaretoken",'{{csrf_token}}')
+    data.append("bookName",document.getElementById("bookName").value) ;
+    data.append("author",document.getElementById("author").value);
+    data.append("publishYear",document.getElementById("publishYear").value);
+
+    axios.post('',data)
+    .then(res=>alert("Book has been Added. Please reload to see changes reflect"))
+    .catch(errors=>console.log(errors))
+  });
+
+</script>
+
+</body>
+</html>

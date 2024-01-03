@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>HOD Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .nav-tabs .nav-item .nav-link {
+            background-color: #72adef;
+            color: #FFF;
+          }
+          
+        .nav-tabs .nav-item .nav-link.active {
+            color: #cf3e16;
+            color: rgb(0, 0, 0);
+          }
+
+        .tab-content {
+            border: 1px solid #dee2e6;
+            border-top: transparent;
+            padding: 15px;
+        }
+        
+        headercolor{
+            background-color: #cf3e16;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #1b6ee2;">
+        <a class="navbar-brand" href="#">HOD Dashboard</a>
+    </nav>
+
+    <div class="container mt-4">
+
+        <!-- Navbar with Options -->
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile">Profile</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" id="announcements-tab" data-toggle="tab" href="#announcements">Announcements</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="course-tab" data-toggle="tab" href="#course">New Joining</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="attendance-tab" data-toggle="tab" href="#attendance">Attendance</a>
+            </li>
+        </ul>
+        
+        <!-- Tab Content -->
+    <div class="tab-content mt-2">
+        <!-- Profile Tab -->
+        <div class="tab-pane fade" id="profile">
+            <h4>Profile</h4>
+            <!-- Teacher Profile Information -->
+            <div class="row">
+                <div class="col-md-4">
+                    <img src="{{Profilepic.picture.url}}" alt="Teacher Image" class="img-fluid">
+                </div>
+                <div class="col-md-8">
+                    <p><strong>Name:</strong> {{request.user.username}}</p>
+                    <p><strong>Course:</strong>{{HOD_course.course_name}}</p>
+                    <button type="button" class="btn btn-danger" onclick="location.href='/logout'">Logout</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Announcements Tab -->
+        <div class="tab-pane fade show active" id="announcements">
+            <h4>Announcements</h4>
+
+            <!-- Add Announcement Form -->
+            <form class="mb-3" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="announcementTitle">Title:</label>
+                    <input type="text" class="form-control" id="announcementTitle" name="announcementTitle" placeholder="Enter Title">
+                </div>
+                <div class="form-group">
+                    <label for="announcementBody">Body:</label>
+                    <textarea class="form-control" name="announcementBody" id="announcementBody" rows="3" placeholder="Enter Body"></textarea>
+                </div>
+                <button type="submit" class="btn btn-success" id="saveAnnouncement">Save</button>
+            </form>
+
+            <!-- Announcements -->
+            {%for i in announcementData%}
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{i.title}}</h5>
+                    <p class="card-text"><strong>Designation:</strong> {{i.designation}}</p>
+                    <p class="card-text">{{i.announcement}}</p>
+                </div>
+            </div>
+            {% endfor %}
+         
+        </div>
+
+        
+        <!-- Register Tab -->
+        <div class="tab-pane fade" id="course">
+            <h4>Register A User</h4>
+            <!-- Add content for Course tab as needed -->
+            <form class="mb-3" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <!--select RegisterType-->
+                    <label for="RegisterType">Select your Register user Type</label>
+                    <select class="form-control" id="RegisterType">
+                        <option value="None" selected disabled hidden>Select an option</option>
+                        <option value="Student" >Student</option>
+                        <option value="Teacher">Teacher</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <!--roll number student-->
+                    <label for="Rollno" id="Rollnolabel">Enter Student Roll Number:</label>
+                    <input type="text" class="form-control" id="Rollno" name="Rollno" placeholder="Enter Roll No.">
+                </div>
+                <!--Enter Name-->
+                <div class="form-group">
+                    <label for="RegisterName" id="RegisterNamelabel">Name:</label>
+                    <input type="text" class="form-control" id="RegisterName" name="RegisterName" placeholder="Enter Name">
+                </div>
+                <!--Enter Password-->
+                <div class="form-group">
+                    <label for="RegisterPassword" id="RegisterPasswordLabel">Enter a Password:</label>
+                    <input type="text" class="form-control" id="RegisterPassword" name="RegisterPassword" placeholder="Give a Password">
+                </div>
+                <!--Profile Image-->
+                <div class="form-group">
+                    <label for="imageInput" id="imageInputLabel">Profile Picture:</label>
+                    <input type="file" class="form-control" id="imageInput" accept="image/*" required>
+                </div>
+                <!--Select Course-->
+                <div class="form-group">
+                    <label for="CourseSelect" id="CourseSelectlabel">Select Course</label>
+                    <select class="form-control" id="CourseSelect">
+                        <option selected disabled hidden>Select A Course</option>
+                        {% for i in courseData %}
+                        <option value="{{i.course_name}}">{{i.course_name}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <!--Select Student ClassTeacher-->
+                <div class="form-group">
+                    <label for="ClassTeacher" id="ClassTeacherlabel">Select Your Teacher</label>
+                    
+                    <select class="form-control" id="ClassTeacher">
+                        {% for i in TeacherData %}
+                        <option value="{{i.teacher_name}}">{{i.teacher_name}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="button" class="btn btn-success" id="Register User">Save</button>
+            </form>
+        </div>
+
+
+<!-- Attendance Tab -->
+<div class="tab-pane fade" id="attendance">
+    <h4>Attendance</h4>
+
+    <!-- Search and Date Added Form -->
+    <form class="form-inline mb-3" method="post">
+        {% csrf_token %}
+        <div class="form-group mr-2">
+            <label for="searchName">Name:</label>
+            <input type="text" class="form-control" id="searchName" placeholder="Enter Name">
+        </div>
+        <div class="form-group mr-2">
+            <label for="searchClass">Class:</label>
+            <!--option selection-->
+            <select class="form-control" id="searchClass">
+                <option value="">All</option>
+                {% for i in courseData %}
+                <option value="{{i.course_name}}">{{i.course_name}}</option>
+                {% endfor %}
+                <!-- Add more options as needed -->
+            </select>
+        </div>
+        <button type="button" class="btn btn-primary ml-2 mr-2" id="searchButton">Search</button>
+
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#attendanceModal">
+            Date Selection
+        </button>
+        <!--button for table save-->
+        <button type="button" class="btn btn-success ml-2" id="saveButton" onclick="GetSelected()">
+            Save
+        </button>
+    </form>
+
+    <!-- Attendance Table -->
+    <table class="table" id="AttendanceTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Class</th>
+                <th>Attendance</th>
+            </tr>
+        </thead>
+        <tbody id="AttendanceTableBody">
+            {% for i in studentAttendance %}
+                {% if request.user.username == i.student_head.HOD.HOD_name %}
+                <tr>
+                    <td>{{i.student_name}}</td>
+                    <td hidden>{{i.id}}</td>
+                    <td>{{i.student_course.course_name}}</td>
+                    {% for j in StudentAttendanceFilter %}
+                        {% if i.student_name == j %}
+                        <td><input type="checkbox" name="checkAttendance" checked="true"></td
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+                {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Modal -->
+    <div class="modal fade" id="attendanceModal" tabindex="-1" role="dialog" aria-labelledby="attendanceModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="attendanceModalLabel">Add Date</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Date Picker Form -->
+                    <form id="addDateForm" method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="attendanceDate">Date:</label>
+                            <input type="text" class="form-control" id="attendanceDate" name="attendanceDate" placeholder="Select Date">
+                        </div>
+                        <button type="button" class="btn btn-primary" id="SelectDateButton">Select Date</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!-- Add date picker library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    // Initialize the date picker
+    flatpickr("#attendanceDate", {
+        dateFormat: "Y-m-d",
+        enableTime: false,
+    });
+
+    //search button function attendance table
+    document.getElementById("searchButton").addEventListener("click", function () {
+        var searchName = document.getElementById("searchName").value.toLowerCase();
+        var searchClass = document.getElementById("searchClass").value.toLowerCase();
+
+        var tableRows = document.querySelectorAll("#attendance tbody tr");
+
+        tableRows.forEach(function (row) {
+            var name = row.querySelector("td:first-child").textContent.toLowerCase();
+            var className = row.querySelector("td:nth-child(3)").textContent.toLowerCase();
+
+            if ((searchName === "" || name.includes(searchName)) &&
+                (searchClass === "" || className.includes(searchClass))) {
+                row.style.display = "table-row";
+            } else {
+                row.style.display = "none";
+            }
+        });
+    });
+
+    //select date button in the date selection attendance
+    document.getElementById("SelectDateButton").addEventListener("click",function (){
+        var dateSelected=document.getElementById("attendanceDate").value;
+        console.log(dateSelected);
+        let data=new FormData();
+        console.log(dateSelected.toString());
+        data.append("csrfmiddlewaretoken","{{csrf_token}}")
+        data.append("LoadDate",dateSelected)
+        axios.post('',data)
+        .catch(errors => console.log(errors))
+        //sending to the new pastpage
+        window.location.href="pastattendance/"+dateSelected.toString();
+
+    });
+
+    //admission form dynamic select
+    document.getElementById("RegisterType").addEventListener('change',function (){
+        const Selectedvalue= document.getElementById("RegisterType").value;
+        //for making the form visable
+        document.getElementById("RegisterNamelabel").style.display="block";
+        document.getElementById("RegisterName").style.display="block";
+        document.getElementById("RegisterPasswordLabel").style.display="block";
+        document.getElementById("RegisterPassword").style.display="block";
+        document.getElementById("CourseSelectlabel").style.display="block";
+        document.getElementById("CourseSelect").style.display="block";
+        document.getElementById("Register User").style.display="block";
+        document.getElementById("imageInput").style.display="block";
+        document.getElementById("imageInputLabel").style.display="block";
+
+        if(Selectedvalue=="Student"){
+            document.getElementById("Rollnolabel").style.display="block";
+            document.getElementById("Rollno").style.display="block";
+            document.getElementById("ClassTeacher").style.display="block";
+            document.getElementById("ClassTeacherlabel").style.display="block";
+        }
+        else{
+            document.getElementById("Rollnolabel").style.display="none";
+            document.getElementById("Rollno").style.display="none";
+            document.getElementById("ClassTeacherlabel").style.display="none";
+            document.getElementById("ClassTeacher").style.display="none";
+        }
+    });
+
+    //submit form for student or teacher
+    document.getElementById("Register User").addEventListener('click',function(){
+
+        let data=new FormData();
+
+        const Selectedvalue= document.getElementById("RegisterType").value;
+        const Name=document.getElementById("RegisterName").value;
+        const password=document.getElementById("RegisterPassword").value;
+        const course=document.getElementById("CourseSelect").value;
+        var image=document.getElementById("imageInput");
+        var file=image.files[0];
+        data.append("RegisterType",document.getElementById("RegisterType").value)
+        data.append("csrfmiddlewaretoken",'{{csrf_token}}')
+        data.append("RegisterName",document.getElementById("RegisterName").value)
+        data.append("RegisterPassword",document.getElementById("RegisterPassword").value)
+        data.append("CourseSelect",document.getElementById("CourseSelect").value)
+        data.append("PictureProfile",file);
+        if (Selectedvalue=="Student")
+        {
+            const teacher=document.getElementById("ClassTeacher").value;
+            const rollno=document.getElementById("Rollno").value;
+            data.append("ClassTeacher",document.getElementById("ClassTeacher").value)
+            data.append("Rollno",document.getElementById("Rollno").value)
+        };
+        axios.post('',data)
+        .then(res=>alert("Form has been submitted"))
+        .catch(errors=>console.log(errors))
+        
+    });
+
+    //initialize on page loading
+    window.onload=function() {
+            document.getElementById("Rollnolabel").style.display="none";
+            document.getElementById("Rollno").style.display="none";
+            document.getElementById("ClassTeacherlabel").style.display="none";
+            document.getElementById("ClassTeacher").style.display="none";
+            document.getElementById("RegisterNamelabel").style.display="none";
+            document.getElementById("RegisterName").style.display="none";
+            document.getElementById("RegisterPasswordLabel").style.display="none";
+            document.getElementById("RegisterPassword").style.display="none";
+            document.getElementById("CourseSelectlabel").style.display="none";
+            document.getElementById("CourseSelect").style.display="none";
+            document.getElementById("Register User").style.display="none";
+            document.getElementById("imageInputLabel").style.display="none";
+            document.getElementById("imageInput").style.display="none";
+            ensureThreeColumns();
+    };
+
+    //checkbox data for attendance tabel data
+    function GetSelected() {
+        //Reference the Table.
+        var grid = document.getElementById("AttendanceTable");
+ 
+        //Reference the CheckBoxes in Table.
+        var checkBoxes = grid.getElementsByTagName("INPUT");
+        var StudentName=[];
+        var StudentID=[]
+        var dateSelected=document.getElementById("attendanceDate").value;
+ 
+        //Loop through the CheckBoxes.
+        for (var i = 0; i < checkBoxes.length; i++) {
+            if (checkBoxes[i].checked) {
+                var row = checkBoxes[i].parentNode.parentNode;
+                StudentName.push(row.cells[0].innerHTML);
+                StudentID.push(row.cells[1].innerHTML);
+            }
+        }
+        console.log("StudentID=",StudentID,"\n StudentName=",StudentName,"\n Date=",dateSelected);
+        //Display selected Row data in Alert Box.
+        let data=new FormData();
+
+        data.append("AttendanceStudentID",StudentID)
+        data.append("csrfmiddlewaretoken",'{{csrf_token}}')
+        data.append("StudentName",StudentName)
+        data.append("DateSelected",document.getElementById("attendanceDate").value)
+        axios.post('',data)
+        .then(res=>alert("data saved"))
+        .catch(errors=>console.log(errors))
+    }
+
+
+    //function to add template uncheckbox on table
+    function ensureThreeColumns() {
+        var tableBody = document.getElementById('AttendanceTableBody');
+        var rows = tableBody.getElementsByTagName('tr');
+        // Start the loop from index 0 as we are iterating through tbody
+        for (var i = 0; i < rows.length; i++) {
+          var columns = rows[i].getElementsByTagName('td');
+          console.log(columns.length)
+          // Check if there are less than 2 columns in the data row (since we already have one)
+          if (columns.length < 4) {
+            // Calculate how many columns are missing
+              var newColumn = document.createElement('td');
+              var checkboxInput = document.createElement('input');
+              checkboxInput.type = 'checkbox';
+              checkboxInput.name = 'checkAttendance';
+              newColumn.appendChild(checkboxInput);
+              rows[i].appendChild(newColumn);
+          }
+        }
+      }
+</script>
+
+</body>
+</html>

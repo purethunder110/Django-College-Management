@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .nav-tabs .nav-item .nav-link {
+            background-color: #22d19f;
+            color: #FFF;
+          }
+          
+        .nav-tabs .nav-item .nav-link.active {
+            color: #cf3e16;
+            color: rgb(0, 0, 0);
+          }
+
+        .tab-content {
+            border: 1px solid #dee2e6;
+            border-top: transparent;
+            padding: 15px;
+        }
+        
+        headercolor{
+            background-color: #cf3e16;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #25e9c5;">
+        <a class="navbar-brand">Student Dashboard</a>
+    </nav>
+
+    <div class="container mt-4">
+
+        <!-- Navbar with Options -->
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile">Profile</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" id="announcements-tab" data-toggle="tab" href="#announcements">Announcements</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="attendance-tab" data-toggle="tab" href="#attendance">Attendance</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="library-tab" data-toggle="tab" href="#Library">Library</a>
+            </li>
+        </ul>
+        
+        <!-- Tab Content -->
+    <div class="tab-content mt-2">
+        <!-- Profile Tab -->
+        <div class="tab-pane fade" id="profile">
+            <h4>Profile</h4>
+
+            <!-- Teacher Profile Information -->
+            <div class="row">
+                <div class="col-md-4">
+                    <img src="{{Profilepic.picture.url}}" alt="Student Image" class="img-fluid">
+                </div>
+                <div class="col-md-8">
+                    <p><strong>Name:</strong> {{request.user.username}}</p>
+                    <p><strong>ID:</strong> {{studentModel.roll_number}}</p>
+                    <p><strong>Teacher:</strong> {{studentModel.student_head.teacher_name}}</p>
+                    <p><strong>HOD:</strong> {{studentModel.student_head.HOD.HOD_name}}</p>
+                    <p><strong>Course:</strong> {{studentModel.student_course.course_name}}</p>
+                    <button type="button" class="btn btn-danger" onclick="location.href='/logout'">Logout</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Announcements Tab -->
+        <div class="tab-pane fade show active" id="announcements">
+            <h4>Announcements</h4>
+            <!-- Announcements -->
+            {%for i in announcementData%}
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{i.title}}</h5>
+                    <p class="card-text"><strong>Designation:</strong> {{i.designation}}</p>
+                    <p class="card-text">{{i.announcement}}</p>
+                </div>
+            </div>
+            {% endfor %}
+         
+        </div>
+
+
+<!-- Attendance Tab -->
+<div class="tab-pane fade" id="attendance">
+    <h4>Attendance Of the Month</h4>
+
+    
+
+    <!-- Attendance Table -->
+    <table class="table" id="AttendanceTable">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Class</th>
+                <th>Attendance</th>
+            </tr>
+        </thead>
+        <tbody id="AttendanceTableBody">
+            {% for key, value in PresentData.items %}
+                <tr>
+                    <td>{{key}}</td>
+                    <td>{{courseTaken}}</td>
+                    <td>{{value}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Modal -->
+    <div class="modal fade" id="attendanceModal" tabindex="-1" role="dialog" aria-labelledby="attendanceModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="attendanceModalLabel">Add Date</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Date Picker Form -->
+                    <form id="addDateForm" method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="attendanceDate">Date:</label>
+                            <input type="text" class="form-control" id="attendanceDate" name="attendanceDate" placeholder="Select Date">
+                        </div>
+                        <button type="button" class="btn btn-primary" id="SelectDateButton">Select Date</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="tab-pane fade" id="Library">
+    <div class="container mt-4">
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link" id="book-list" data-toggle="tab" href="#BookList">BookList</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="issue-list" data-toggle="tab" href="#IssueList">Issue List</a>
+            </li>
+        </ul>
+
+            <div class="tab-content">
+                <div id="BookList" class="tab-pane fade">
+                    current book management
+                    <button type="button" class="btn btn-primary ml-2 mr-2" id="issueButton">issue</button>
+                    <table class="table" id="bookAvailable">
+                        <thead>
+                            <th>Name</th>
+                            <th>author</th>
+                            <th></th>
+                        </thead>
+                        <tbody>
+                            {% for i in BookList %}
+                            <tr>
+                                <td>{{i.name}}</td>
+                                <td>{{i.author}}</td>
+                                <td hidden>{{i.id}}</td>
+                                <td><input type="checkbox"></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div id="IssueList" class="tab-pane fade">
+                    Issue Book
+                    <table class="table" id="issuebook">
+                        <thead>
+                            <th>Name</th>
+                            <th>Date Of Issue</th>
+                            <th>Return</th>
+                        </thead>
+                        <tbody>
+                            {% for i in issuedbook %}
+                            <tr>
+                                <td>{{i.book.name}}</td>
+                                <td>{{i.date_issued}}</td>
+                                <td>
+                                <button type="button" class="btn btn-primary ml-2 mr-2" id="ReturnButton" onclick="ReturnButton({{i.id}})" >Return This Book</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+    </div>
+</div>
+
+
+
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!-- Add date picker library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    // Initialize the date picker
+    flatpickr("#attendanceDate", {
+        dateFormat: "Y-m-d",
+        enableTime: false,
+    });
+
+    //search button function attendance table
+    
+
+    //select date button in the date selection attendance
+    document.getElementById("SelectDateButton").addEventListener("click",function (){
+        var dateSelected=document.getElementById("attendanceDate").value;
+        console.log(dateSelected);
+        let data=new FormData();
+        console.log(dateSelected.toString());
+        data.append("csrfmiddlewaretoken","{{csrf_token}}")
+        data.append("LoadDate",dateSelected)
+        axios.post('',data)
+        .catch(errors => console.log(errors))
+        //sending to the new pastpage
+        window.location.href="pastattendance/"+dateSelected.toString();
+
+    });
+
+
+    //initialize on page loading
+    window.onload=function() {
+            console.log("Loaded Site");
+    };
+    
+    document.getElementById("issueButton").addEventListener("click",function(){
+        var grid=document.getElementById("bookAvailable")
+
+        var checkbox=grid.getElementsByTagName("INPUT")
+        var titleid=[];
+
+        for (var i=0;i<checkbox.length;i++){
+            if(checkbox[i].checked){
+                var row=checkbox[i].parentNode.parentNode;
+                titleid.push(row.cells[2].innerHTML);
+            }
+        }
+        
+        let data=new FormData();
+        data.append("csrfmiddlewaretoken","{{csrf_token}}")
+        data.append("bookissue",titleid)
+
+        axios.post('',data)
+        .then(res=>alert("data saved"))
+        .catch(errors=>console.log(errors))
+    });
+
+    function ReturnButton(IssueID){
+        data=new FormData();
+        data.append("IssueID",IssueID);
+        data.append("csrfmiddlewaretoken","{{csrf_token}}");
+        console.log("ReturnedID:",IssueID);
+        axios.post('',data)
+        .then(res=>alert("The book has been returned. Please reload the Page to changes to take effect"))
+        .catch(errors=>console.log(errors))
+    };
+</script>
+
+
+
+</body>
+</html>

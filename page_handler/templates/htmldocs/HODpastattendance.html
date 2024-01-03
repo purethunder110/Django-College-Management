@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Attendance Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<br><!-- Search and Date Added Form -->
+    <form class="form-inline mb-3" method="post">
+        {% csrf_token %}
+        <div class="form-group mr-2">
+            <label for="searchName">Name:</label>
+            <input type="text" class="form-control" id="searchName" placeholder="Enter Name">
+        </div>
+        <div class="form-group mr-2">
+            <label for="searchClass">Class:</label>
+            <!--option selection-->
+            <select class="form-control" id="searchClass">
+                <option value="">All</option>
+                {% for i in courseData %}
+                <option value="{{i.course_name}}">{{i.course_name}}</option>
+                {% endfor %}
+                <!-- Add more options as needed -->
+            </select>
+        </div>
+        <button type="button" class="btn btn-primary ml-2 mr-2" id="searchButton">Search</button>
+
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#attendanceModal">
+            Date Selection
+        </button>
+        <!--button for table save-->
+        <button type="button" class="btn btn-success ml-2" id="saveButton" onclick="GetSelected()">
+            Save
+        </button>
+    </form>
+
+    <!-- Attendance Table -->
+    <table class="table" id="AttendanceTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Class</th>
+                <th>Attendance</th>
+            </tr>
+        </thead>
+        <tbody id="AttendanceTableBody">
+            {% for i in studentAttendance %}
+                {% if request.user.username == i.student_head.HOD.HOD_name %}
+                <tr>
+                    <td>{{i.student_name}}</td>
+                    <td hidden>{{i.id}}</td>
+                    <td>{{i.student_course.course_name}}</td>
+                    {% for j in StudentAttendanceFilter %}
+                        {% if i.student_name == j %}
+                        <td><input type="checkbox" name="checkAttendance" checked="true"></td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+                {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Modal -->
+    <div class="modal fade" id="attendanceModal" tabindex="-1" role="dialog" aria-labelledby="attendanceModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="attendanceModalLabel">Add Date</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Date Picker Form -->
+                    <form id="addDateForm" method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="attendanceDate">Date:</label>
+                            <input type="text" class="form-control" id="attendanceDate" name="attendanceDate" placeholder="Select Date">
+                        </div>
+                        <button type="button" class="btn btn-primary" id="SelectDateButton">Select Date</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+        // Initialize the date picker
+        flatpickr("#attendanceDate", {
+            dateFormat: "Y-m-d",
+            enableTime: false,
+        });
+    
+        //search button function attendance table
+        document.getElementById("searchButton").addEventListener("click", function () {
+            var searchName = document.getElementById("searchName").value.toLowerCase();
+            var searchClass = document.getElementById("searchClass").value.toLowerCase();
+    
+            var tableRows = document.querySelectorAll("#attendance tbody tr");
+    
+            tableRows.forEach(function (row) {
+                var name = row.querySelector("td:first-child").textContent.toLowerCase();
+                var className = row.querySelector("td:nth-child(3)").textContent.toLowerCase();
+    
+                if ((searchName === "" || name.includes(searchName)) &&
+                    (searchClass === "" || className.includes(searchClass))) {
+                    row.style.display = "table-row";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        });
+
+        document.getElementById("SelectDateButton").addEventListener("click",function (){
+            var dateSelected=document.getElementById("attendanceDate").value;
+            console.log(dateSelected);
+            let data=new FormData();
+            console.log(dateSelected.toString());
+            data.append("csrfmiddlewaretoken","{{csrf_token}}");
+            data.append("LoadDate",dateSelected);
+            axios.post('',data)
+            .catch(errors => console.log(errors));
+            //sending to the new pastpage
+            window.location.replace("/hodDashboard/pastattendance/"+dateSelected.toString());
+
+        });
+
+        function ensureThreeColumns() {
+            var tableBody = document.getElementById('AttendanceTableBody');
+            var rows = tableBody.getElementsByTagName('tr');
+            // Start the loop from index 0 as we are iterating through tbody
+            for (var i = 0; i < rows.length; i++) {
+              var columns = rows[i].getElementsByTagName('td');
+              console.log(columns.length)
+              // Check if there are less than 2 columns in the data row (since we already have one)
+              if (columns.length < 4) {
+                // Calculate how many columns are missing
+                  var newColumn = document.createElement('td');
+                  var checkboxInput = document.createElement('input');
+                  checkboxInput.type = 'checkbox';
+                  checkboxInput.name = 'checkAttendance';
+                  newColumn.appendChild(checkboxInput);
+                  rows[i].appendChild(newColumn);
+              }
+            }
+          }
+    window.onload = ensureThreeColumns;
+
+
+    function GetSelected() {
+        //Reference the Table.
+        var grid = document.getElementById("AttendanceTable");
+ 
+        //Reference the CheckBoxes in Table.
+        var checkBoxes = grid.getElementsByTagName("INPUT");
+        var StudentName=[]; 
+        var StudentID=[];
+        var dateSelected=document.getElementById("attendanceDate").value;
+ 
+        //Loop through the CheckBoxes.
+        for (var i = 0; i < checkBoxes.length; i++) {
+            if (checkBoxes[i].checked) {
+                var row = checkBoxes[i].parentNode.parentNode;
+                StudentName.push(row.cells[0].innerHTML);
+                StudentID.push(row.cells[1].innerHTML);
+            }
+        }
+        console.log("StudentID=",StudentID,"\n StudentName=",StudentName,"\n Date=",dateSelected);
+        //Display selected Row data in Alert Box.
+        let data=new FormData();
+
+        data.append("AttendanceStudentID",StudentID)
+        data.append("csrfmiddlewaretoken",'{{csrf_token}}')
+        data.append("StudentName",StudentName)
+        //data.append("DateSelected",document.getElementById("attendanceDate").value)
+        axios.post('',data)
+        .then(res=>alert("data saved"))
+        .catch(errors=>console.log(errors))
+    }
+</script>
+</body>
