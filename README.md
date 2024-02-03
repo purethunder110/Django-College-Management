@@ -4,7 +4,7 @@ A simple college management project using django.
 
 to run the app, simply follow these steps:
 
-1.pip install -r requirements.txt
+1.pip install django
 
 2.python manage.py makemigrations
 
