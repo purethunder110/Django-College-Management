@@ -126,16 +126,6 @@
                         {% endfor %}
                     </select>
                 </div>
-                <!--Select HOD undertaking-->
-                <div class="form-group">
-                    <label for="HODSelect" id="HODSelectlabel">Select HOD</label>
-                    <select class="form-control" id="HODSelect">
-                        <option selected disabled hidden>Select HOD</option>
-                        {% for i in HODList %}
-                        <option value="{{i.id}}">{{i.HOD_name}}</option>
-                        {% endfor %}
-                    </select>
-                </div>
                 <!--Select Student ClassTeacher-->
                 <div class="form-group">
                     <label for="ClassTeacher" id="ClassTeacherlabel">Select Your Teacher</label>
@@ -345,8 +335,10 @@
             document.getElementById("HODSelectlabel").style.display="block";
             document.getElementById("HODSelect").style.display="block";
             document.getElementById("Register User").style.display="block";
+            /*
             document.getElementById("imageInput").style.display="block";
             document.getElementById("imageInputLabel").style.display="block";
+            */
         }
         else if(Selectedvalue=="HOD"){
             document.getElementById("RegisterNamelabel").style.display="block";
@@ -390,7 +382,6 @@
             data.append("RegisterName",document.getElementById("RegisterName").value)
             data.append("RegisterPassword",document.getElementById("RegisterPassword").value)
             data.append("CourseSelect",document.getElementById("CourseSelect").value)
-            data.append("HODSelect",document.getElementById("CourseSelect").value)
         }
         else if (Selectedvalue=="HOD")
         {
